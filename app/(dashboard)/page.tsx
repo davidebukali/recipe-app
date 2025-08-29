@@ -1,13 +1,12 @@
-import { ChartAreaInteractive } from "@/components/chart-area-interactive";
 import { SectionCards } from "@/components/section-cards";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <>
-      <SectionCards />
-      <div className="px-4 lg:px-6">
-        <ChartAreaInteractive />
-      </div>
-    </>
-  );
+  const isAuthenticated = true; // Replace with real check (e.g., session, token)
+
+  if (!isAuthenticated) {
+    redirect("/login");
+  }
+
+  return <SectionCards />;
 }
