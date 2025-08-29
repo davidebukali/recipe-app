@@ -34,12 +34,12 @@ const data = {
     },
     {
       title: "Recipes",
-      url: "#",
+      url: "/recipes",
       icon: IconListDetails,
     },
     {
       title: "Tasks",
-      url: "#",
+      url: "/tasks",
       icon: IconChartBar,
     },
   ],
