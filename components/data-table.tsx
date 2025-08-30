@@ -65,6 +65,7 @@ import {
 import { DatePicker } from "./ui/date-picker";
 import { Textarea } from "./ui/textarea";
 import { Task } from "@/features/tasks/taskSlice";
+import { useMemo } from "react";
 
 const columns: ColumnDef<Task>[] = [
   {
@@ -167,7 +168,9 @@ const columns: ColumnDef<Task>[] = [
 ];
 
 export function DataTable({ data: initialData }: { data: Task[] }) {
-  const [data] = React.useState(() => initialData);
+  const data = useMemo(() => {
+    return initialData;
+  }, [initialData]);
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
