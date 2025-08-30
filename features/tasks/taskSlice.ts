@@ -37,46 +37,6 @@ const initialState: Task[] = [
     dueDate: "27",
     priority: "low",
   },
-  {
-    id: 64,
-    title: "Release Management Process",
-    description: "Planning",
-    status: "todo",
-    dueDate: "22",
-    priority: "medium",
-  },
-  {
-    id: 65,
-    title: "Feature Prioritization Matrix",
-    description: "Planning",
-    status: "in-progress",
-    dueDate: "19",
-    priority: "high",
-  },
-  {
-    id: 66,
-    title: "Technical Debt Assessment",
-    description: "Technical content",
-    status: "done",
-    dueDate: "24",
-    priority: "low",
-  },
-  {
-    id: 67,
-    title: "Capacity Planning",
-    description: "Planning",
-    status: "todo",
-    dueDate: "21",
-    priority: "medium",
-  },
-  {
-    id: 68,
-    title: "Service Level Agreements",
-    description: "Legal",
-    status: "in-progress",
-    dueDate: "26",
-    priority: "high",
-  },
 ];
 
 export const taskSlice = createSlice({

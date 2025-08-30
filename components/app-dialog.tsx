@@ -13,35 +13,36 @@ import { IconPlus } from "@tabler/icons-react";
 
 interface AppDialogProps {
   title: string; // Example of a custom prop
+  formId: string; // ID for the form to be submitted
   children: React.ReactNode; // For passing child elements
 }
 
-export function AppDialog({ title, children }: AppDialogProps) {
+export function AppDialog({ title, formId, children }: AppDialogProps) {
   return (
     <Dialog>
-      <form>
-        <DialogTrigger asChild>
-          <Button variant="outline" size="sm">
-            <IconPlus />
-            <span className="hidden lg:inline">{title}</span>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm">
+          <IconPlus />
+          <span className="hidden lg:inline">{title}</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>
+            Click save when you&apos;re done.
+          </DialogDescription>
+        </DialogHeader>
+        {children}
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline">Cancel</Button>
+          </DialogClose>
+          <Button type="submit" form={formId}>
+            Save changes
           </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>
-              Click save when you&apos;re done.
-            </DialogDescription>
-          </DialogHeader>
-          {children}
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button type="submit">Save changes</Button>
-          </DialogFooter>
-        </DialogContent>
-      </form>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 }
