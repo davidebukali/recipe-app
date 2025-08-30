@@ -24,7 +24,6 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { z } from "zod";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Badge } from "@/components/ui/badge";
@@ -65,17 +64,9 @@ import {
 } from "@/components/ui/table";
 import { DatePicker } from "./ui/date-picker";
 import { Textarea } from "./ui/textarea";
+import { Task } from "@/features/tasks/taskSlice";
 
-export const schema = z.object({
-  id: z.number(),
-  title: z.string(),
-  description: z.string(),
-  status: z.string(),
-  priority: z.string(),
-  duedate: z.string(),
-});
-
-const columns: ColumnDef<z.infer<typeof schema>>[] = [
+const columns: ColumnDef<Task>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -128,7 +119,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     filterFn: "equalsString",
     cell: ({ row }) => (
       <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.status === "Done" ? (
+        {row.original.status === "done" ? (
           <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
         ) : (
           <IconLoader />
@@ -148,7 +139,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
         Due Date
       </Button>
     ),
-    cell: ({ row }) => <p className="">{row.original.duedate}</p>,
+    cell: ({ row }) => <p className="">{row.original.dueDate}</p>,
     enableSorting: true,
   },
   {
@@ -175,12 +166,8 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   },
 ];
 
-export function DataTable({
-  data: initialData,
-}: {
-  data: z.infer<typeof schema>[];
-}) {
-  const [data, setData] = React.useState(() => initialData);
+export function DataTable({ data: initialData }: { data: Task[] }) {
+  const [data] = React.useState(() => initialData);
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -393,7 +380,7 @@ export function DataTable({
   );
 }
 
-function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
+function TableCellViewer({ item }: { item: Task }) {
   const isMobile = useIsMobile();
   const [dueDate, setDueDate] = React.useState<Date | undefined>(undefined);
 
