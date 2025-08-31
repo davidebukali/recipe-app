@@ -120,7 +120,10 @@ export function DataTable({
       accessorKey: "priority",
       header: "Priority",
       enableSorting: false,
-      filterFn: "equalsString",
+      filterFn: (row, columnId, filterValue) => {
+        if (!filterValue || filterValue === "all") return true; // show all
+        return row.getValue(columnId) === filterValue;
+      },
       cell: ({ row }) => (
         <Badge variant="outline" className="text-muted-foreground px-1.5">
           {row.original.priority}
@@ -131,7 +134,10 @@ export function DataTable({
       accessorKey: "status",
       header: "Status",
       enableSorting: false,
-      filterFn: "equalsString",
+      filterFn: (row, columnId, filterValue) => {
+        if (!filterValue || filterValue === "all") return true; // show all
+        return row.getValue(columnId) === filterValue;
+      },
       cell: ({ row }) => (
         <Badge variant="outline" className="text-muted-foreground px-1.5">
           {row.original.status === "done" ? (
