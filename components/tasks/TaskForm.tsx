@@ -17,6 +17,7 @@ import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import moment from "moment";
 
 export type priority = "low" | "medium" | "high";
 export type status = "todo" | "in-progress" | "done";
@@ -72,9 +73,7 @@ export function TaskForm({
       description: data.description,
       priority: data.priority as priority,
       status: data.status as status,
-      dueDate: data.dueDate
-        ? data.dueDate.toISOString()
-        : Date.now().toString(),
+      dueDate: data.dueDate ? data.dueDate : Date.now().toString(),
     });
 
     submitHandler({
@@ -84,8 +83,8 @@ export function TaskForm({
       priority: data.priority as priority,
       status: data.status as status,
       dueDate: data.dueDate
-        ? data.dueDate.toISOString()
-        : Date.now().toString(),
+        ? moment(data.dueDate).format()
+        : moment(Date.now().toString()).format(),
     });
 
     // Reset the form
