@@ -42,7 +42,7 @@ const taskSchema = z.object({
     .refine((date) => date !== null, "Due date is required"),
 });
 
-type TaskFormState = z.infer<typeof taskSchema>;
+export type TaskFormState = z.infer<typeof taskSchema>;
 
 export function TaskForm({
   submitHandler,

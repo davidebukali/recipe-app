@@ -64,110 +64,28 @@ import {
 } from "@/components/ui/table";
 import { DatePicker } from "./ui/date-picker";
 import { Textarea } from "./ui/textarea";
-import { Task } from "@/features/tasks/taskSlice";
 import { useMemo } from "react";
+import { Task } from "@/lib/taskLocalstorage";
+import moment from "moment";
+import { useForm, Controller } from "react-hook-form";
+import { toast } from "sonner";
 
-const columns: ColumnDef<Task>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <div className="flex items-center justify-center">
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      </div>
-    ),
-    cell: ({ row }) => (
-      <div className="flex items-center justify-center">
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      </div>
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "title",
-    header: "Task",
-    cell: ({ row }) => {
-      return <TableCellViewer item={row.original} />;
-    },
-    enableHiding: false,
-  },
-  {
-    accessorKey: "priority",
-    header: "Priority",
-    enableSorting: false,
-    filterFn: "equalsString",
-    cell: ({ row }) => (
-      <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.priority}
-      </Badge>
-    ),
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    enableSorting: false,
-    filterFn: "equalsString",
-    cell: ({ row }) => (
-      <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.status === "done" ? (
-          <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
-        ) : (
-          <IconLoader />
-        )}
-        {row.original.status}
-      </Badge>
-    ),
-  },
-  {
-    accessorKey: "duedate",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        className="px-0"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Due Date
-      </Button>
-    ),
-    cell: ({ row }) => <p className="">{row.original.dueDate}</p>,
-    enableSorting: true,
-  },
-  {
-    id: "actions",
-    cell: () => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-            size="icon"
-          >
-            <IconDotsVertical />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
-  },
-];
+interface EditTaskFormState {
+  id: number;
+  title: string;
+  description: string;
+  status: "todo" | "in-progress" | "done";
+  dueDate: Date | undefined;
+  priority: "low" | "medium" | "high";
+}
 
-export function DataTable({ data: initialData }: { data: Task[] }) {
+export function DataTable({
+  data: initialData,
+  handleEditTask,
+}: {
+  data: Task[];
+  handleEditTask: (task: Task) => void;
+}) {
   const data = useMemo(() => {
     return initialData;
   }, [initialData]);
@@ -182,6 +100,114 @@ export function DataTable({ data: initialData }: { data: Task[] }) {
     pageIndex: 0,
     pageSize: 10,
   });
+
+  const columns: ColumnDef<Task>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <div className="flex items-center justify-center">
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={(value) =>
+              table.toggleAllPageRowsSelected(!!value)
+            }
+            aria-label="Select all"
+          />
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+        </div>
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "title",
+      header: "Task",
+      cell: ({ row }) => {
+        return (
+          <TableCellViewer item={row.original} onEditTask={handleEditTask} />
+        );
+      },
+      enableHiding: false,
+    },
+    {
+      accessorKey: "priority",
+      header: "Priority",
+      enableSorting: false,
+      filterFn: "equalsString",
+      cell: ({ row }) => (
+        <Badge variant="outline" className="text-muted-foreground px-1.5">
+          {row.original.priority}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      enableSorting: false,
+      filterFn: "equalsString",
+      cell: ({ row }) => (
+        <Badge variant="outline" className="text-muted-foreground px-1.5">
+          {row.original.status === "done" ? (
+            <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
+          ) : (
+            <IconLoader />
+          )}
+          {row.original.status}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "duedate",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          className="px-0"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Due Date
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <p className="">
+          {moment(row.original.dueDate).format("dddd, MMMM Do YYYY")}
+        </p>
+      ),
+      enableSorting: true,
+    },
+    {
+      id: "actions",
+      cell: () => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+              size="icon"
+            >
+              <IconDotsVertical />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-32">
+            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ];
 
   const table = useReactTable({
     data,
@@ -224,9 +250,9 @@ export function DataTable({ data: initialData }: { data: Task[] }) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
-              <SelectItem value="Done">Done</SelectItem>
-              <SelectItem value="In Progress">In Progress</SelectItem>
-              <SelectItem value="Not Started">Not Started</SelectItem>
+              <SelectItem value="done">Done</SelectItem>
+              <SelectItem value="in-progress">In Progress</SelectItem>
+              <SelectItem value="todo">Not Started</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -244,9 +270,9 @@ export function DataTable({ data: initialData }: { data: Task[] }) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
-              <SelectItem value="High">High</SelectItem>
-              <SelectItem value="Medium">Medium</SelectItem>
-              <SelectItem value="Low">Low</SelectItem>
+              <SelectItem value="high">High</SelectItem>
+              <SelectItem value="medium">Medium</SelectItem>
+              <SelectItem value="low">Low</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -383,9 +409,33 @@ export function DataTable({ data: initialData }: { data: Task[] }) {
   );
 }
 
-function TableCellViewer({ item }: { item: Task }) {
+export function TableCellViewer({
+  item,
+  onEditTask,
+}: {
+  item: Task;
+  onEditTask: (task: Task) => void;
+}) {
   const isMobile = useIsMobile();
-  const [dueDate, setDueDate] = React.useState<Date | undefined>(undefined);
+
+  const { register, handleSubmit, control } = useForm<EditTaskFormState>({
+    defaultValues: {
+      id: item.id,
+      title: item.title,
+      description: item.description,
+      priority: item.priority as "low" | "medium" | "high",
+      status: item.status as "done" | "in-progress" | "todo",
+      dueDate: item.dueDate ? new Date(item.dueDate) : undefined,
+    },
+  });
+
+  const submitEditForm = (data: EditTaskFormState) => {
+    onEditTask({
+      ...data,
+      dueDate: data.dueDate ? moment(data.dueDate).format() : "",
+    });
+    toast.success("Your task has been edited");
+  };
 
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
@@ -398,72 +448,92 @@ function TableCellViewer({ item }: { item: Task }) {
         <DrawerHeader className="gap-1">
           <DrawerTitle>Editing {item.title}</DrawerTitle>
         </DrawerHeader>
+
         <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
-          <form className="flex flex-col gap-4">
+          <form
+            onSubmit={handleSubmit(submitEditForm)}
+            className="flex flex-col gap-4"
+          >
+            {/* Title */}
             <div className="flex flex-col gap-3">
               <Label htmlFor="title">Title</Label>
-              <Input id="title" defaultValue={item.title} />
+              <Input id="title" {...register("title", { required: true })} />
             </div>
+
+            {/* Description */}
             <div className="flex flex-col gap-3">
-              <Label htmlFor="title">Description</Label>
-              <Textarea id="title" defaultValue={item.description} />
+              <Label htmlFor="description">Description</Label>
+              <Textarea id="description" {...register("description")} />
             </div>
+
+            {/* Priority + Status */}
             <div className="grid grid-cols-2 gap-4">
+              {/* Priority */}
               <div className="flex flex-col gap-3">
-                <Label htmlFor="type">Priority</Label>
-                <Select defaultValue={item.priority}>
-                  <SelectTrigger id="type" className="w-full">
-                    <SelectValue placeholder="Select a type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Table of Contents">
-                      Table of Contents
-                    </SelectItem>
-                    <SelectItem value="Executive Summary">
-                      Executive Summary
-                    </SelectItem>
-                    <SelectItem value="Technical Approach">
-                      Technical Approach
-                    </SelectItem>
-                    <SelectItem value="Design">Design</SelectItem>
-                    <SelectItem value="Capabilities">Capabilities</SelectItem>
-                    <SelectItem value="Focus Documents">
-                      Focus Documents
-                    </SelectItem>
-                    <SelectItem value="Narrative">Narrative</SelectItem>
-                    <SelectItem value="Cover Page">Cover Page</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="priority">Priority</Label>
+                <Controller
+                  name="priority"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger id="priority" className="w-full">
+                        <SelectValue placeholder="Select a priority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
+
+              {/* Status */}
               <div className="flex flex-col gap-3">
                 <Label htmlFor="status">Status</Label>
-                <Select defaultValue={item.status}>
-                  <SelectTrigger id="status" className="w-full">
-                    <SelectValue placeholder="Select a status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Done">Done</SelectItem>
-                    <SelectItem value="In Progress">In Progress</SelectItem>
-                    <SelectItem value="Not Started">Not Started</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="status"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger id="status" className="w-full">
+                        <SelectValue placeholder="Select a status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="done">Done</SelectItem>
+                        <SelectItem value="in-progress">In Progress</SelectItem>
+                        <SelectItem value="todo">Not Started</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
             </div>
+
+            {/* Due Date */}
             <div className="flex flex-col gap-3">
-              <DatePicker
-                label={"Due Date"}
-                date={dueDate}
-                setDate={setDueDate}
+              <Controller
+                name="dueDate"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    label="Due Date"
+                    date={field.value || undefined}
+                    setDate={field.onChange}
+                  />
+                )}
               />
             </div>
+
+            <DrawerFooter>
+              <Button type="submit">Submit</Button>
+              <DrawerClose asChild>
+                <Button variant="outline">Done</Button>
+              </DrawerClose>
+            </DrawerFooter>
           </form>
         </div>
-        <DrawerFooter>
-          <Button>Submit</Button>
-          <DrawerClose asChild>
-            <Button variant="outline">Done</Button>
-          </DrawerClose>
-        </DrawerFooter>
       </DrawerContent>
     </Drawer>
   );
