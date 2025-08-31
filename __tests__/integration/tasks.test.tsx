@@ -1,9 +1,11 @@
 import { describe, expect, test, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { Task, TaskForm } from "@/components/tasks/TaskForm";
 import { DataTable } from "@/components/data-table";
 
 const mockTaskFormSubmit = vi.fn();
+const mockTaskEditFormSubmit = vi.fn();
 
 describe("Tasks", () => {
   test("can add a task", async () => {
@@ -28,12 +30,14 @@ describe("Tasks", () => {
 
     expect(screen.getByLabelText(/title/i)).toHaveValue("Test Task");
 
-    fireEvent.click(screen.getByText(/Save changes/i));
+    await fireEvent.click(
+      screen.getByRole("button", { name: /Save changes/i })
+    );
     expect(screen.getByLabelText(/title/i)).toBeEmptyDOMElement();
   });
 
   // test it lists tasks
-  test("lists tasks", async () => {
+  test("can list tasks", async () => {
     const tasks: Task[] = [
       {
         id: 61,
@@ -60,11 +64,55 @@ describe("Tasks", () => {
         priority: "low",
       },
     ];
-    render(<DataTable data={tasks} />);
+    render(<DataTable data={tasks} handleEditTask={mockTaskEditFormSubmit} />);
     expect(
       screen.getByText("Monitoring and Alerting System")
     ).toBeInTheDocument();
     expect(screen.getByText("Code Review Guidelines")).toBeInTheDocument();
     expect(screen.getByText("Documentation Standards")).toBeInTheDocument();
+  });
+
+  test("can edit task", async () => {
+    const tasks: Task[] = [
+      {
+        id: 61,
+        title: "Monitoring and Alerting System",
+        description: "Technical content",
+        status: "in-progress",
+        dueDate: "25",
+        priority: "medium",
+      },
+      {
+        id: 62,
+        title: "Code Review Guidelines",
+        description: "Technical content",
+        status: "todo",
+        dueDate: "12",
+        priority: "high",
+      },
+      {
+        id: 63,
+        title: "Documentation Standards",
+        description: "Technical content",
+        status: "todo",
+        dueDate: "27",
+        priority: "low",
+      },
+    ];
+    render(<DataTable data={tasks} handleEditTask={mockTaskEditFormSubmit} />);
+
+    // Create a user instance
+    const user = userEvent.setup();
+    expect(
+      screen.getByText("Monitoring and Alerting System")
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Monitoring and Alerting System"));
+
+    expect(
+      screen.getByText("Editing Monitoring and Alerting System")
+    ).toBeVisible();
+
+    await user.click(screen.getByRole("button", { name: /submit/i }));
+    expect(mockTaskEditFormSubmit).toHaveBeenCalledTimes(1);
   });
 });
