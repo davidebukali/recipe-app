@@ -1,11 +1,13 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { Task, TaskForm } from "@/components/tasks/TaskForm";
 import { DataTable } from "@/components/data-table";
 
+const mockTaskFormSubmit = vi.fn();
+
 describe("Tasks", () => {
   test("can add a task", async () => {
-    render(<TaskForm />);
+    render(<TaskForm submitHandler={mockTaskFormSubmit} />);
 
     fireEvent.click(screen.getByText(/Add Task/i));
 
@@ -27,7 +29,6 @@ describe("Tasks", () => {
     expect(screen.getByLabelText(/title/i)).toHaveValue("Test Task");
 
     fireEvent.click(screen.getByText(/Save changes/i));
-
     expect(screen.getByLabelText(/title/i)).toBeEmptyDOMElement();
   });
 
