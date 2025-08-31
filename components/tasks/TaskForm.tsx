@@ -13,12 +13,21 @@ import { Textarea } from "../ui/textarea";
 import { DatePicker } from "../ui/date-picker";
 import React from "react";
 import { AppDialog } from "../app-dialog";
-import { useDispatch } from "react-redux";
-import { add, priority, status } from "./../../features/tasks/taskSlice";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+
+export type priority = "low" | "medium" | "high";
+export type status = "todo" | "in-progress" | "done";
+export interface Task {
+  id: number;
+  title: string;
+  description: string;
+  priority: priority;
+  status: status;
+  dueDate: string; // ISO date string
+}
 
 // 1. Define a Zod schema for validation
 const taskSchema = z.object({
@@ -35,8 +44,6 @@ const taskSchema = z.object({
 type TaskFormState = z.infer<typeof taskSchema>;
 
 export function TaskForm() {
-  const dispatch = useDispatch();
-
   const {
     handleSubmit,
     control,
@@ -55,18 +62,16 @@ export function TaskForm() {
 
   const onSubmit = (data: TaskFormState) => {
     // Dispatch the validated data to the Redux store
-    dispatch(
-      add({
-        id: Date.now(),
-        title: data.title,
-        description: data.description,
-        priority: data.priority as priority,
-        status: data.status as status,
-        dueDate: data.dueDate
-          ? data.dueDate.toISOString()
-          : Date.now().toString(),
-      })
-    );
+    console.log("Form Data:", {
+      id: Date.now(),
+      title: data.title,
+      description: data.description,
+      priority: data.priority as priority,
+      status: data.status as status,
+      dueDate: data.dueDate
+        ? data.dueDate.toISOString()
+        : Date.now().toString(),
+    });
     // Reset the form
     reset();
     toast.success("Your new task has been added");
