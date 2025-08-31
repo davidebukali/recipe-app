@@ -43,7 +43,11 @@ const taskSchema = z.object({
 
 type TaskFormState = z.infer<typeof taskSchema>;
 
-export function TaskForm() {
+export function TaskForm({
+  submitHandler,
+}: {
+  submitHandler: (data: Task) => void;
+}) {
   const {
     handleSubmit,
     control,
@@ -72,6 +76,18 @@ export function TaskForm() {
         ? data.dueDate.toISOString()
         : Date.now().toString(),
     });
+
+    submitHandler({
+      id: Date.now(),
+      title: data.title,
+      description: data.description,
+      priority: data.priority as priority,
+      status: data.status as status,
+      dueDate: data.dueDate
+        ? data.dueDate.toISOString()
+        : Date.now().toString(),
+    });
+
     // Reset the form
     reset();
     toast.success("Your new task has been added");
