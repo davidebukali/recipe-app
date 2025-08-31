@@ -6,6 +6,7 @@ import { DataTable } from "@/components/data-table";
 
 const mockTaskFormSubmit = vi.fn();
 const mockTaskEditFormSubmit = vi.fn();
+const mockTaskDelete = vi.fn();
 
 describe("Tasks", () => {
   test("can add a task", async () => {
@@ -64,7 +65,13 @@ describe("Tasks", () => {
         priority: "low",
       },
     ];
-    render(<DataTable data={tasks} handleEditTask={mockTaskEditFormSubmit} />);
+    render(
+      <DataTable
+        data={tasks}
+        handleEditTask={mockTaskEditFormSubmit}
+        onDelete={mockTaskDelete}
+      />
+    );
     expect(
       screen.getByText("Monitoring and Alerting System")
     ).toBeInTheDocument();
@@ -99,7 +106,13 @@ describe("Tasks", () => {
         priority: "low",
       },
     ];
-    render(<DataTable data={tasks} handleEditTask={mockTaskEditFormSubmit} />);
+    render(
+      <DataTable
+        data={tasks}
+        handleEditTask={mockTaskEditFormSubmit}
+        onDelete={mockTaskDelete}
+      />
+    );
 
     // Create a user instance
     const user = userEvent.setup();
@@ -114,5 +127,43 @@ describe("Tasks", () => {
 
     await user.click(screen.getByRole("button", { name: /submit/i }));
     expect(mockTaskEditFormSubmit).toHaveBeenCalledTimes(1);
+  });
+
+  test("can delete task", async () => {
+    const tasks: Task[] = [
+      {
+        id: 61,
+        title: "Monitoring and Alerting System",
+        description: "Technical content",
+        status: "in-progress",
+        dueDate: "25",
+        priority: "medium",
+      },
+    ];
+    render(
+      <DataTable
+        data={tasks}
+        handleEditTask={mockTaskEditFormSubmit}
+        onDelete={mockTaskDelete}
+      />
+    );
+
+    // Create a user instance
+    const user = userEvent.setup();
+    expect(
+      screen.getByText("Monitoring and Alerting System")
+    ).toBeInTheDocument();
+
+    // Get the button by its data-testid
+    const button = screen.getByTestId("dropdown-61");
+    // Click the button
+    await user.click(button);
+
+    const deleteButton = screen.getByText("Delete");
+
+    expect(deleteButton).toBeVisible();
+    await user.click(deleteButton);
+
+    expect(mockTaskDelete).toHaveBeenCalledTimes(1);
   });
 });
