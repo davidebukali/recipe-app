@@ -2,7 +2,12 @@
 
 import { DataTable } from "@/components/data-table";
 import { Task, TaskForm } from "@/components/tasks/TaskForm";
-import { createTask, getTasks, updateTask } from "@/lib/taskLocalstorage";
+import {
+  createTask,
+  deleteTask,
+  getTasks,
+  updateTask,
+} from "@/lib/taskLocalstorage";
 import moment from "moment";
 import React, { useEffect } from "react";
 
@@ -31,6 +36,15 @@ export default function Tasks() {
     setTaskId(Date.now());
   };
 
+  const deleteHandler = (data: Task) => {
+    const isDeleted = confirm("Are you sure you want to delete this task?");
+    if (isDeleted) {
+      const success = deleteTask(data.id);
+      if (success) {
+        setTaskId(Date.now());
+      }
+    }
+  };
   return (
     <div className="flex flex-col">
       <div className="pull-right mb-4 flex justify-end">
@@ -38,7 +52,11 @@ export default function Tasks() {
       </div>
       <div className="mb-4 text-2xl font-bold"></div>
       <div className="">
-        <DataTable data={tasks} handleEditTask={editHandler} />
+        <DataTable
+          data={tasks}
+          handleEditTask={editHandler}
+          onDelete={deleteHandler}
+        />
       </div>
     </div>
   );

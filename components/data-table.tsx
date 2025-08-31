@@ -82,9 +82,11 @@ interface EditTaskFormState {
 export function DataTable({
   data: initialData,
   handleEditTask,
+  onDelete,
 }: {
   data: Task[];
   handleEditTask: (task: Task) => void;
+  onDelete: (task: Task) => void;
 }) {
   const data = useMemo(() => {
     return initialData;
@@ -103,39 +105,13 @@ export function DataTable({
 
   const columns: ColumnDef<Task>[] = [
     {
-      id: "select",
-      header: ({ table }) => (
-        <div className="flex items-center justify-center">
-          <Checkbox
-            checked={
-              table.getIsAllPageRowsSelected() ||
-              (table.getIsSomePageRowsSelected() && "indeterminate")
-            }
-            onCheckedChange={(value) =>
-              table.toggleAllPageRowsSelected(!!value)
-            }
-            aria-label="Select all"
-          />
-        </div>
-      ),
-      cell: ({ row }) => (
-        <div className="flex items-center justify-center">
-          <Checkbox
-            checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
-            aria-label="Select row"
-          />
-        </div>
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
       accessorKey: "title",
       header: "Task",
       cell: ({ row }) => {
         return (
-          <TableCellViewer item={row.original} onEditTask={handleEditTask} />
+          <p className="w-20">
+            <TableCellViewer item={row.original} onEditTask={handleEditTask} />
+          </p>
         );
       },
       enableHiding: false,
@@ -179,7 +155,7 @@ export function DataTable({
         </Button>
       ),
       cell: ({ row }) => (
-        <p className="">
+        <p className="w-20">
           {moment(row.original.dueDate).format("dddd, MMMM Do YYYY")}
         </p>
       ),
@@ -187,22 +163,26 @@ export function DataTable({
     },
     {
       id: "actions",
-      cell: () => (
+      cell: ({ row }) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+              className="data-[state=open]:bg-muted text-muted-foreground flex size-8 data-test-delete"
               size="icon"
+              data-testid={`dropdown-${row.original.id}`}
             >
               <IconDotsVertical />
               <span className="sr-only">Open menu</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-32">
-            <DropdownMenuItem>Edit</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={() => onDelete(row.original)}
+            >
+              Delete
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       ),
