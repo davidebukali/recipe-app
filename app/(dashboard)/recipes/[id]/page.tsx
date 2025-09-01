@@ -22,6 +22,7 @@ import { getRecipeInfo } from "@/lib/api";
 import { Recipe } from "@/components/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { ChevronLeftIcon } from "lucide-react";
 
 export type ingredients = {
   name: string;
@@ -56,7 +57,15 @@ export default function RecipeDetails({}: RecipeDetailsProps) {
     <>
       <div className="flex">
         <div className="">
-          <Button onClick={() => router.back()}>⬅ Back</Button>
+          <Button
+            variant="secondary"
+            size="icon"
+            className="size-8"
+            onClick={() => router.back()}
+          >
+            <ChevronLeftIcon />
+            Back
+          </Button>
         </div>
       </div>
       <div className="container mx-auto max-w-3xl py-4">
