@@ -109,7 +109,7 @@ export function DataTable({
       header: "Task",
       cell: ({ row }) => {
         return (
-          <p className="w-20">
+          <p className="w-60">
             <TableCellViewer item={row.original} onEditTask={handleEditTask} />
           </p>
         );
