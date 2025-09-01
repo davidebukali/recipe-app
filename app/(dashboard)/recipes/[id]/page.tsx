@@ -57,12 +57,7 @@ export default function RecipeDetails({}: RecipeDetailsProps) {
     <>
       <div className="flex">
         <div className="">
-          <Button
-            variant="secondary"
-            size="icon"
-            className="size-8"
-            onClick={() => router.back()}
-          >
+          <Button variant="secondary" onClick={() => router.back()}>
             <ChevronLeftIcon />
             Back
           </Button>
