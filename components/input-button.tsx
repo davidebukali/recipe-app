@@ -3,13 +3,18 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import React from "react";
+import { Recipe } from "./card";
+import { Loader2Icon } from "lucide-react";
+import { IconSearch } from "@tabler/icons-react";
 
 export function InputButton({
   title,
   handleSubmit,
+  loading,
 }: {
   title: string;
   handleSubmit: (query: string) => void;
+  loading: boolean;
 }) {
   const [query, setQuery] = React.useState("");
   return (
@@ -21,7 +26,8 @@ export function InputButton({
         onChange={(e) => setQuery(e.target.value)}
       />
       <Button onClick={() => handleSubmit(query)} variant="outline">
-        {title}
+        {loading && <Loader2Icon className="animate-spin" />}
+        <IconSearch /> {title}
       </Button>
     </div>
   );

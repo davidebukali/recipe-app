@@ -7,13 +7,18 @@ import React from "react";
 
 export default function Recipes() {
   const [recipes, setRecipes] = React.useState(() => []);
+  const [loading, setLoading] = React.useState(false);
 
   const handleSearch = (query: string) => {
     console.log("Searching for:", query);
-    searchRecipes(query).then((data) => {
-      console.log("Recipes found:", data);
-      setRecipes(data.recipes);
-    });
+    if (query.length) {
+      setLoading(true);
+      searchRecipes(query).then((data) => {
+        console.log("Recipes found:", data);
+        setRecipes(data.recipes);
+        setLoading(false);
+      });
+    }
   };
 
   // Memoize recipe grid rendering
@@ -49,7 +54,11 @@ export default function Recipes() {
           </p>
         </div>
         <div className="flex justify-center m-4">
-          <InputButton title="Search" handleSubmit={handleSearch} />
+          <InputButton
+            title="Search"
+            handleSubmit={handleSearch}
+            loading={loading}
+          />
         </div>
       </div>
       {recipeGrid}
