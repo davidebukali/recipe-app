@@ -2,17 +2,17 @@ const createURL = (path: string) => {
   return window.location.origin + path;
 };
 
-export const getBusinesses = async (tableName: string, page = 1) => {
+export const getRecipeInfo = async (id: string) => {
   const res = await fetch(
-    new Request(createURL("/api/db"), {
+    new Request(createURL("/api/recipe-detail"), {
       method: "POST",
-      body: JSON.stringify({ content: tableName, page }),
+      body: JSON.stringify({ id }),
     })
   );
 
-  if (res.ok) {
-    return await res.json();
-  }
+  const data = await res.json();
+
+  return data;
 };
 
 export const searchRecipes = async (query: string) => {

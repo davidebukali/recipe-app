@@ -9,7 +9,6 @@ export async function POST(request: NextRequest) {
       {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${process.env.SB_API_TOKEN}`,
           "Content-Type": "application/json",
         },
       }

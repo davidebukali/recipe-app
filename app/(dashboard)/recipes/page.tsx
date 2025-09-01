@@ -6,7 +6,7 @@ import { searchRecipes } from "@/lib/api";
 import React from "react";
 
 export default function Recipes() {
-  const [recipes, setRecipes] = React.useState([]);
+  const [recipes, setRecipes] = React.useState(() => []);
 
   const handleSearch = (query: string) => {
     console.log("Searching for:", query);
@@ -15,6 +15,29 @@ export default function Recipes() {
       setRecipes(data.recipes);
     });
   };
+
+  // Memoize recipe grid rendering
+  const recipeGrid = React.useMemo(() => {
+    if (recipes.length === 0) {
+      return (
+        <div className="flex justify-center m-4">
+          <p className="text-center">
+            No recipes found. Try searching for something!
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-3 gap-4">
+        {recipes.map((recipe: Recipe) => (
+          <div key={recipe.id}>
+            <RecipeCard recipe={recipe} />
+          </div>
+        ))}
+      </div>
+    );
+  }, [recipes]);
 
   return (
     <>
@@ -29,24 +52,7 @@ export default function Recipes() {
           <InputButton title="Search" handleSubmit={handleSearch} />
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-4">
-        {recipes.map((recipe: Recipe) => (
-          <div key={recipe.id}>
-            <RecipeCard recipe={recipe} />
-          </div>
-        ))}
-      </div>
-      <div className="flex flex-col gap-8">
-        <div className="flex justify-center m-4">
-          {recipes.length === 0 && (
-            <div>
-              <p className="text-center">
-                No recipes found. Try searching for something!
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
+      {recipeGrid}
     </>
   );
 }
