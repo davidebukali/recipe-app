@@ -9,7 +9,15 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 
-export function RecipeCard({ recipe }: { recipe: any }) {
+export interface Recipe {
+  id: number;
+  title: string;
+  image: string;
+  summary: string;
+  readyInMinutes: number;
+}
+
+export function RecipeCard({ recipe }: { recipe: Recipe }) {
   return (
     <Card className="overflow-hidden p-0">
       <div className="relative">

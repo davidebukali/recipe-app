@@ -1,6 +1,6 @@
 "use client";
 
-import { RecipeCard } from "@/components/card";
+import { Recipe, RecipeCard } from "@/components/card";
 import { InputButton } from "@/components/input-button";
 import { searchRecipes } from "@/lib/api";
 import React from "react";
@@ -30,7 +30,7 @@ export default function Recipes() {
         </div>
       </div>
       <div className="grid grid-cols-3 gap-4">
-        {recipes.map((recipe: any) => (
+        {recipes.map((recipe: Recipe) => (
           <div key={recipe.id}>
             <RecipeCard recipe={recipe} />
           </div>
