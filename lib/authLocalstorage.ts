@@ -5,12 +5,12 @@ export interface User {
   username: string;
   email: string;
   password: string;
+  isLoggedIn: boolean;
 }
 
 /**
  * Logs in a user by checking credentials against the saved user in localStorage.
  * If credentials match, the function returns true.
- * This assumes the user data is already stored in localStorage via a separate process (e.g., registration).
  * @param email - The user's email
  * @param password - The user's password
  * @returns true if login successful, false otherwise
@@ -19,13 +19,15 @@ export const login = (email: string, password: string): boolean => {
   try {
     const user = getLoggedInUser();
     if (!user) {
-      return false; // No user found in localStorage to check against
+      return false;
     }
     // Check if the provided credentials match the saved user
     if (user.email === email && user.password === password) {
-      return true; // Credentials match, login successful
+      const updatedUser = { ...user, isLoggedIn: true };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUser));
+      return true;
     }
-    return false; // Invalid credentials
+    return false;
   } catch (error) {
     console.error("Failed to log in:", error);
     return false;
@@ -37,7 +39,11 @@ export const login = (email: string, password: string): boolean => {
  */
 export const logout = (): void => {
   try {
-    localStorage.removeItem(STORAGE_KEY);
+    const user = getLoggedInUser();
+    if (user) {
+      const updatedUser = { ...user, isLoggedIn: false };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUser));
+    }
   } catch (error) {
     console.error("Failed to log out:", error);
   }
@@ -66,7 +72,8 @@ export const getLoggedInUser = (): User | null => {
  * @returns true if a user is logged in, false otherwise
  */
 export const isLoggedIn = (): boolean => {
-  return getLoggedInUser() !== null;
+  const user = getLoggedInUser();
+  return user !== null && user.isLoggedIn;
 };
 
 /**

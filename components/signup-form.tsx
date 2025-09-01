@@ -33,7 +33,10 @@ export function SignupForm({
 
   const onSubmit = (data: SignupFormInputs) => {
     console.log("Signup data:", data);
-    const auth = saveUser(data);
+    const auth = saveUser({
+      isLoggedIn: false,
+      ...data,
+    });
     if (!auth) {
       toast.error("Failed to sign up. Please try again.");
     } else {
