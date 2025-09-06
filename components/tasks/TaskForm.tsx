@@ -67,15 +67,6 @@ export function TaskForm({
 
   const onSubmit = (data: TaskFormState) => {
     // Dispatch the validated data to the Redux store
-    console.log("Form Data:", {
-      id: Date.now(),
-      title: data.title,
-      description: data.description,
-      priority: data.priority as priority,
-      status: data.status as status,
-      dueDate: data.dueDate ? data.dueDate : Date.now().toString(),
-    });
-
     submitHandler({
       id: Date.now(),
       title: data.title,
@@ -98,6 +89,7 @@ export function TaskForm({
         <form
           id="task-form"
           className="flex flex-col gap-4"
+          data-testid="taskFormTestId"
           onSubmit={handleSubmit(onSubmit)}
         >
           <div className="flex flex-col gap-3">
@@ -141,7 +133,9 @@ export function TaskForm({
                       <SelectValue placeholder="Select a Priority" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="high">High</SelectItem>
+                      <SelectItem data-testid="highPriority" value="high">
+                        High
+                      </SelectItem>
                       <SelectItem value="medium">Medium</SelectItem>
                       <SelectItem value="low">Low</SelectItem>
                     </SelectContent>
@@ -163,7 +157,9 @@ export function TaskForm({
                       <SelectValue placeholder="Select a status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="done">Done</SelectItem>
+                      <SelectItem data-testid="doneStatus" value="done">
+                        Done
+                      </SelectItem>
                       <SelectItem value="in-progress">In Progress</SelectItem>
                       <SelectItem value="todo">Not Started</SelectItem>
                     </SelectContent>
