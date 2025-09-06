@@ -8,5 +8,15 @@ export default defineConfig({
     environment: "happy-dom",
     setupFiles: ["./setupTests.ts"],
     globals: true,
+    // Uncomment to enable browser testing
+    // browser: {
+    //   instances: [
+    //     {
+    //       browser: "chromium",
+    //       launch: {},
+    //       context: {},
+    //     },
+    //   ],
+    // },
   },
 });
