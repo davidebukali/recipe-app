@@ -2,47 +2,28 @@
 
 import { DataTable } from "@/components/data-table";
 import { Task, TaskForm } from "@/components/tasks/TaskForm";
-import {
-  createTask,
-  deleteTask,
-  getTasks,
-  updateTask,
-} from "@/lib/taskLocalstorage";
+import { useTasks } from "@/hooks/useTasks";
 import moment from "moment";
-import React, { useEffect } from "react";
+import React from "react";
 
 export default function Tasks() {
-  const [taskId, setTaskId] = React.useState<number>(0);
-  const [tasks, setTasks] = React.useState<Task[]>([]);
-
-  useEffect(() => {
-    setTasks(getTasks());
-  }, [taskId]);
+  const { tasks, createTask, updateTask, deleteTask } = useTasks();
 
   const submitHandler = (data: Task) => {
-    // Handle form submission logic here
-    console.log("Form submitted:", data);
-    const task = createTask(data);
-    setTaskId(task.id);
+    createTask(data);
   };
 
   const editHandler = (data: Task) => {
-    // Handle form submission logic here
-    console.log("Edit Form submitted:", data);
     updateTask(data.id, {
       ...data,
       dueDate: data.dueDate ? moment(data.dueDate).format() : undefined,
     });
-    setTaskId(Date.now());
   };
 
   const deleteHandler = (data: Task) => {
     const isDeleted = confirm("Are you sure you want to delete this task?");
     if (isDeleted) {
-      const success = deleteTask(data.id);
-      if (success) {
-        setTaskId(Date.now());
-      }
+      deleteTask(data.id);
     }
   };
   return (
